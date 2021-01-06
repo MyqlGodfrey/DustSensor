@@ -1,5 +1,4 @@
 #include <ArduinoOTA.h>
-
 #include <Commands.h>
 #include <NovaSDS011.h>
 #include <ESP8266mDNS.h>
@@ -139,17 +138,19 @@ void loop() {
    
    //handle OTA update
     ArduinoOTA.handle();
+
+    
    //handle web connection
     server.handleClient();
    
     
- float p25, p10;
-  if (sds011.queryData(p25, p10) == QuerryError::no_error)
-  {
-    PM25 = p25;
-    PM10 = p10;
-    Serial.println(String(millis() / 1000) + "s:PM2.5=" + String(p25) + ", PM10=" + String(p10));
-    delay(1000);
+   float p25, p10;
+   if (sds011.queryData(p25, p10) == QuerryError::no_error)
+   {
+     PM25 = p25;
+     PM10 = p10;
+     Serial.println(String(millis() / 1000) + "s:PM2.5=" + String(p25) + ", PM10=" + String(p10));
+     delay(1000);
   }
 }
 
@@ -163,7 +164,6 @@ void handle_OnConnect() {
   TemperatureF = tempF;
   Humidity = tempH;
   FeelsLike = tempFeelsLike;
- 
   
   server.send(200, "text/html", SendHTML(FeelsLike,Humidity,PM10, PM25, TemperatureF)); 
 }
@@ -189,7 +189,7 @@ ptr +="      <meta http-equiv=\"refresh\" content=\"5\" />";
 ptr +="     </noscript>";
 ptr +="    <style>";
 ptr +="        html {";
-ptr +="            font-family: 'Open Sans', sans-serif; display: block; color: #333333;";
+ptr +="            font-family: 'Open Sans', sans-serif; display: block; color: #333333; margin:0;padding:0;";
 ptr +="        }";
 ptr +="        .wrapper {";
 ptr +="            margin-right: auto; margin-left: auto; padding-right: 10px; padding-left: 10px;";
@@ -225,11 +225,18 @@ ptr +="            font-size: 120px;";
 ptr +="            text-align: right;";
 ptr +="        }";
 ptr +="        .superscript {";
-ptr +="            font-size: 32px;";
-ptr +="            font-weight: 600;";
+ptr +="            font-size: 42px;";
+ptr +="            font-weight: 300;";
 ptr +="            vertical-align: super;";
+ptr +="            position: absolute;";
 ptr +="        }";
 ptr +="";
+ptr +="        .particlesuperscript {";
+ptr +="            font-size: 24px;";
+ptr +="            font-weight: 300;";
+ptr +="            vertical-align: super;";
+ptr +="            position: absolute;";
+ptr +="        }";
 ptr +="    </style>";
 ptr +="</head>";
 ptr +="<body>";
@@ -255,7 +262,7 @@ ptr +="<span class=\"superscript\">&deg;F</span></td>";
 ptr +="            </tr>";
 ptr +="            <tr>";
 ptr +="                <td class=\"humidity-icon\"><img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAABmJLR0QA/wD/AP+gvaeTAAAE30lEQVRoge1YTWxUVRT+7psZYBCwDfYHBElR/orSqoSYGBOMC010IRDRSGJExCYqRoqJGo2ZSKJSxRqpGtGQIMgCFi5g48IY4sa4UCKBiPxIEEEDbekUbGfePedz8d7MvLYznc68aWUxX/LmvXfn3jPfd879OWeAKqqooorrHkt2J1ct2ZN89P/mkQ+mWIfb9nbPMKnYMaVEJILms+trr0wEsbHCKdZBrjnvWNfOEZez+C+3jheR5j39a5u/6n+s1HGjRmDOpz3LHNVfSDggQFJBvfP8yw2/lk91JBbuS95k0jgOAkyj+fe2GZfHOnbUCDDlbrWuOtZVWFdgrToieDs85WG/M8D3VVgnqnUa1Y5SxhaMQOO2iytozI8EDEiQ/o+RpJh7ut+c9VM42h6avui5z4FzGKQhABA0wAOn22q/H8v4ghGwwhetVSOuwLoKyUTBVSNWXqgE+ZUJRqHoUlEjQqh3GRHtuvtzxsIJcPVBn7B3WYG4CrEKEXmoEgLO1PduUctlmiWvUFWIsPmS290eSoBYiYvNEPbvuWtyWPKNH1+so+jrWfKqyAkhxPKN+o/+aQghgN8NI50VoiLfhhUQ0UhChTd6Hh9K3hOj06MWb5UvQPQ1sdqbR0T3ILglDPnZ27vnqvJZzUM8KMYqN8764MK8sgSkOuafSAtbRPSAWE2K1aSI7LdptqJjwfkwAiztqyqclCPuz/8hYggVjVnXvDKaraKpRKVR0/lHTSw15QKAOAAwuz8DzHTy2/zbgNr07CuJprwpTNFUotKIDk5+QpVxz+M63OPZNsm2MU4Te7yQvQkXYIWr85DMIya3rVJ0TSF70YkkDwC02pKZKvSPXvi33BTyPgLvLYXsTbwA1ThhhrAN6gDyCptSyN6EC1DFaYCtY/J+NlQ4VcheRQQ07+lfKwRPPDX9QLG+qjwIojWv54Hs1hN8NODBQvZCL+LFu5MzrWUXRT9ZvDs5s1h/h+4OVU2qElR/wfoXRXPvkv2+b1Bs17gJsGndpqJ1alnnpvW9Yv2vvrvgkiqfUSUDJP0dZ4QoVfJpbF9UsMAJdZDd+lnPvXTMD5maAQCp5v6zz9ceLjY20n56jQF3AZgBMDhzMmuizxhdL52LvhnNTtkCViYYPdvQ8zOJO7Jr0dNw9NzlmXchYWxRI5tO1jkRbgLxMICFBAjFSePwkEaxYzTPhxYwb0f3BgW/9LzF4IYCKjdc2Fy/q1zbpaAsAUsTnNRXc/k3gk3MbXVBIeduiCUXnnppQapSRAuhrEXcO+1Sm4g2ifWPfL9WUOulB2L1lr6BaRsrTTYfSo7AnA//jKdt7AzAxqzDcwW//wAQ+Ds+Reafb587UDm6I1FyBAZTkdUq2pjxtlovg/QqNfpRUKjVxmtXsWo8SAdRsgAVPBkg6U0ZP3MUyVVUXruuGw/SQZScSojI8mHbpv8ytCDxv1oenuLoKFmACqcCGL7reE0BQf5yKJhFVgrlCDgOcAWAYafn0OTMP5ePh2ZYBKWvAcrevGWgjmwj8fV4kA6iZAED/bJTlUf8/24C5d/QpEwVR1JTB3aOB+kgyjqJ45tP3Gyd6CGCrbmig8HHI2r0EXQu+qsyNAuj/Gw0cWyS0zv5OQNdR+B2ACBwlOA+1NqdSCxNV4xlFVVUUcV1i/8AeEQWLD9A6A4AAAAASUVORK5CYII=\" /></td>";
-ptr +="                <td class=\"item-text\">Humidty</td>";
+ptr +="                <td class=\"item-text\">Humidity</td>";
 ptr +="                <td class=\"item\">";
 ptr +=String(Humiditystat);
 ptr +="<span class=\"superscript\">%</span></td>";
@@ -267,7 +274,7 @@ ptr +="                </td>";
 ptr +="                <td class=\"item-text\">PM 2.5</td>";
 ptr +="                <td class=\"item\">";
 ptr +=String(PM25);
-ptr +="<span class=\"superscript\">&micro;g/m3</span></td>";
+ptr +="<span class=\"particlesuperscript\">&micro;g/m3</span></td>";
 ptr +="            </tr>";
 ptr +="            <tr>";
 ptr +="                <td class=\"particle-icon\">";
@@ -276,7 +283,7 @@ ptr +="                </td>";
 ptr +="                <td class=\"item-text\">PM 10</td>";
 ptr +="                <td class=\"item\">";
 ptr +=String(PM10);
-ptr +="<span class=\"superscript\">&micro;g/m3</span></td>";
+ptr +="<span class=\"particlesuperscript\">&micro;g/m3</span></td>";
 ptr +="            </tr>";
 ptr +="        </table>";
 ptr +="     </div>";
